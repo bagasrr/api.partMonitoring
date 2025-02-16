@@ -3,7 +3,7 @@ import { AuditLog } from "./auditLog.js";
 import { history } from "./history.js";
 // import { images } from "./images.js";
 import { item } from "./item.js";
-import { machine } from "./Machine.js";
+import { machine } from "./machine.js";
 import { section } from "./section.js";
 import { user } from "./user.js";
 import { ItemUseHistory } from "./itemUseHistory.js";
