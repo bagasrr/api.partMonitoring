@@ -66,7 +66,7 @@ app.use((req, res, next) => {
 
 app.use("/api", routes);
 
-app.listen(process.env.PORT, () => {
+app.listen(process.env.PORT, "::", () => {
   console.log(`Server running on port ${process.env.PORT}`);
 });
 
