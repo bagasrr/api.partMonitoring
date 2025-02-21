@@ -106,7 +106,7 @@ export const updateSection = async (req, res) => {
     await historyModel.create({
       name: section.section_name,
       changeType: "Update",
-      userId: req.userId,
+      username: req.name,
       category: "Section Room",
       description: "Section updated",
     });

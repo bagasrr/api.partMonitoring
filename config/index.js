@@ -7,10 +7,10 @@ dotenv.config();
 // Pastikan semua variabel environment terisi
 const { DB_NAME, DB_USER, DB_PASS, DB_HOST, DB_PORT } = process.env;
 
-if (!DB_NAME || !DB_USER || !DB_PASS || !DB_HOST) {
-  console.error("❌ Error: Variabel environment belum lengkap. Cek file .env!");
-  process.exit(1); // Hentikan aplikasi jika konfigurasi tidak lengkap
-}
+// if (!DB_NAME || !DB_USER || !DB_PASS || !DB_HOST) {
+//   console.error("❌ Error: Variabel environment belum lengkap. Cek file .env!");
+//   process.exit(1); // Hentikan aplikasi jika konfigurasi tidak lengkap
+// }
 
 // Buat koneksi Sequelize ke MySQL
 const db = new Sequelize(DB_NAME, DB_USER, DB_PASS, {
