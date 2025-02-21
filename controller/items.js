@@ -228,253 +228,6 @@ export const getSwapReplaceItem = async (req, res) => {
   }
 };
 
-// export const createItem = async (req, res) => {
-//   const { name, amount, description, status, lowerLimit, machine_name, machine_number, section_name, section_number, replacementType, year, item_number, vendor_name } = req.body;
-
-//   try {
-//     if (typeof amount !== "number" || typeof lowerLimit !== "number") {
-//       return res.status(400).json({ message: "Invalid data type" });
-//     }
-//     // Validate that amount is greater than 0
-//     if (amount <= 0) return res.status(400).json({ message: "Amount must be greater than 0" });
-
-//     let machine = await machineModel.findOne({ where: { machine_name } });
-
-//     if (replacementType === "Replace") {
-//       const item = await itemModel.findOne({ where: { name, deletedAt: null, machineId: machine.id } });
-//       if (item) return res.status(400).json({ message: `PartName '${name}' in machine ${machine_name} Already Exist, Please use different Name or select Add Amount` });
-//     } else {
-//       const item = await itemModel.findOne({ where: { item_number } });
-//       if (item) return res.status(400).json({ message: `PartNumber ${item_number} Already Exist, Please use different Number` });
-//     }
-
-//     // Find or create machine
-
-//     if (!machine) {
-//       // Find or create section
-//       let section = await sectionModel.findOne({ where: { section_name } });
-
-//       if (!section) {
-//         section = await sectionModel.create({
-//           section_name,
-//           section_number,
-//           userId: req.userId,
-//         });
-
-//         // Create history record for section creation
-//         await historyModel.create({
-//           name: section.section_name,
-//           changeType: "Create",
-//           category: "Section Room",
-//           username: req.name,
-//           description: "Section created",
-//         });
-
-//         // Log the section creation in audit logs
-//         await logAuditEvent("Section", section.id, "create", {
-//           section_name: section.section_name,
-//           section_number: section.section_number,
-//         });
-//       }
-
-//       machine = await machineModel.create({
-//         machine_name,
-//         machine_number,
-//         sectionId: section.id,
-//         userId: req.userId,
-//       });
-
-//       // Create history record for machine creation
-//       await historyModel.create({
-//         name: machine.machine_name,
-//         changeType: "Create",
-//         category: "Machine",
-//         username: req.name,
-//         description: "Machine created",
-//       });
-
-//       // Log the machine creation in audit logs
-//       await logAuditEvent("Machine", machine.id, "create", {
-//         machine_name: machine.machine_name,
-//         machine_number: machine.machine_number,
-//         section_name: section.section_name,
-//       });
-//     }
-
-//     const vendor = await vendorModel.findOne({ where: { vendor_name } });
-//     if (!vendor && vendor_name !== null) {
-//       await vendorModel.create({
-//         vendor_name,
-//         userId: req.userId,
-//       });
-//       await historyModel.create({
-//         name: vendor_name,
-//         changeType: "Create",
-//         category: "Vendor",
-//         username: req.name,
-//         description: "Vendor created during part creation",
-//       });
-//       await logAuditEvent("Vendor", vendor.id, "create", { vendor_name: vendor.vendor_name });
-//     }
-
-//     const newItem = await itemModel.create({
-//       name,
-//       amount,
-//       description,
-//       status,
-//       lowerLimit,
-//       userId: req.userId,
-//       machineId: machine.id,
-//       replacementType,
-//       year,
-//       item_number,
-//       vendorId: vendor?.id || null,
-//     });
-
-//     await addItemHistories(newItem.id, req.userId, "Part Added");
-
-//     // Create history record for new item creation
-//     await historyModel.create({
-//       name,
-//       changeType: "Create",
-//       category: "Part",
-//       username: req.name,
-//       description,
-//       newStock: amount,
-//       afterStock: amount,
-//     });
-
-//     // Log the create action in the audit logs
-//     await logAuditEvent("Part", newItem.id, "create", {
-//       name: newItem.name,
-//       amount: newItem.amount,
-//       description,
-//       status,
-//       lowerLimit,
-//     });
-
-//     return res.status(201).json({ message: "Part created", data: newItem });
-//   } catch (error) {
-//     return res.status(500).json({ message: error.message });
-//   }
-// };
-
-//kedua
-// export const createItem = async (req, res) => {
-//   const { name, amount, description, status, lowerLimit, machine_name, machine_number, section_name, section_number, replacementType, year, item_number, vendor_name } = req.body;
-
-//   try {
-//     if (typeof amount !== "number" || typeof lowerLimit !== "number") {
-//       return res.status(400).json({ message: "Invalid data type" });
-//     }
-
-//     if (amount <= 0) return res.status(400).json({ message: "Amount must be greater than 0" });
-
-//     let machine = await machineModel.findOne({ where: { machine_name } });
-
-//     if (replacementType === "Replace") {
-//       const item = await itemModel.findOne({ where: { name, deletedAt: null, machineId: machine?.id } });
-//       if (item) return res.status(400).json({ message: `${name} on ${machine_name} already exists, please use option \"Add Amount\"` });
-//     } else if (replacementType === "Swap") {
-//       const item = await itemModel.findOne({ where: { item_number } });
-//       if (item) return res.status(400).json({ message: `PartNumber ${item_number} already exists, please use a different number` });
-//     }
-
-//     if (!machine) {
-//       let section = await sectionModel.findOne({ where: { section_name } });
-//       if (!section) {
-//         section = await sectionModel.create({
-//           section_name,
-//           section_number,
-//           userId: req.userId,
-//         });
-//         await historyModel.create({
-//           name: section.section_name,
-//           changeType: "Create",
-//           category: "Section Room",
-//           username: req.name,
-//           description: "Section created",
-//         });
-//         await logAuditEvent("Section", section.id, "create", {
-//           section_name: section.section_name,
-//           section_number: section.section_number,
-//         });
-//       }
-
-//       machine = await machineModel.create({
-//         machine_name,
-//         machine_number,
-//         sectionId: section.id,
-//         userId: req.userId,
-//       });
-
-//       await historyModel.create({
-//         name: machine.machine_name,
-//         changeType: "Create",
-//         category: "Machine",
-//         username: req.name,
-//         description: "Machine created",
-//       });
-//       await logAuditEvent("Machine", machine.id, "create", {
-//         machine_name: machine.machine_name,
-//         machine_number: machine.machine_number,
-//         section_name: section.section_name,
-//       });
-//     }
-
-//     let vendor = await vendorModel.findOne({ where: { vendor_name } });
-//     if (!vendor && vendor_name) {
-//       vendor = await vendorModel.create({ vendor_name, userId: req.userId });
-//       await historyModel.create({
-//         name: vendor_name,
-//         changeType: "Create",
-//         category: "Vendor",
-//         username: req.name,
-//         description: "Vendor created during part creation",
-//       });
-//       await logAuditEvent("Vendor", vendor.id, "create", { vendor_name: vendor.vendor_name });
-//     }
-
-//     const newItem = await itemModel.create({
-//       name,
-//       amount,
-//       description,
-//       status,
-//       lowerLimit,
-//       userId: req.userId,
-//       machineId: machine.id,
-//       replacementType,
-//       year,
-//       item_number,
-//       vendorId: vendor?.id || null,
-//     });
-
-//     await addItemHistories(newItem.id, req.userId, "Part Added");
-
-//     await historyModel.create({
-//       name,
-//       changeType: "Create",
-//       category: "Part",
-//       username: req.name,
-//       description,
-//       newStock: amount,
-//       afterStock: amount,
-//     });
-
-//     await logAuditEvent("Part", newItem.id, "create", {
-//       name: newItem.name,
-//       amount: newItem.amount,
-//       description,
-//       status,
-//       lowerLimit,
-//     });
-
-//     return res.status(201).json({ message: "Part created", data: newItem });
-//   } catch (error) {
-//     return res.status(500).json({ message: error.message });
-//   }
-// };
-
 export const createItem = async (req, res) => {
   const { name, amount, description, status, lowerLimit, machine_name, replacementType, year, item_number, vendor_name } = req.body;
   try {
@@ -489,7 +242,11 @@ export const createItem = async (req, res) => {
     let machine = await machineModel.findOne({ where: { machine_name, deletedAt: null } });
     let vendor = await vendorModel.findOne({ where: { vendor_name, deletedAt: null } });
     if (replacementType === "Replace") {
-      if (partByName && machine) return res.status(400).json(`${name} on ${machine_name} is already exist, If you want to increase amount please use "Add Amount" option`);
+      if (partByName && machine) {
+        return res.status(400).json({
+          message: `Part Name ( ${name} ) is already exist. If you want to increase amount, please use "Add Amount" option or change the Part Name`,
+        });
+      }
 
       const newPart = await itemModel.create({
         name,
@@ -500,16 +257,16 @@ export const createItem = async (req, res) => {
         userId: req.userId,
         machineId: machine.id,
         replacementType,
-        year,
-        item_number,
-        vendorId: vendor?.id || null,
+        year: null,
+        item_number: null,
+        vendorId: null,
       });
 
       await addItemHistories(newPart.id, req.userId, "Part Added");
 
       return res.status(201).json({ message: "Part Added", data: newPart });
     } else if (replacementType === "Swap") {
-      if (partById) return res.status(400).json(`${name} with ${item_number} is already exist, please use different Part Number`);
+      if (partById) return res.status(400).json({ message: `${name} with ${item_number} is already exist, please use different Part Number` });
 
       const newPart = await itemModel.create({
         name,
