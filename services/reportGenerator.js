@@ -35,6 +35,7 @@ export const generateHTMLBrokenReport = (item, status, date, reason, userName) =
         </tbody>
       </table>
       <p style="text-align: right; font-style: italic; margin: 10px 0 0 0;">This is an auto generated email, please don't reply this email</p>
+      <p style="text-align: right; font-style: italic; margin: 10px 0 0 0;">Made by Bagas Ramadhan Rusnadi</p>
     </body>
   </html>
   `;
