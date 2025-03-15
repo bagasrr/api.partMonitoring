@@ -28,6 +28,7 @@ itemRoute.use((req, res, next) => {
 });
 
 itemRoute.get("/", getAllItems);
+// itemRoute.get("/status", updateItemStatusForm);
 
 itemRoute.get("/type-:type", getItemType);
 itemRoute.get("/type-replace", getReplaceItem);

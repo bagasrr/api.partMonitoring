@@ -66,4 +66,12 @@ export const history = {
       notEmpty: false,
     },
   },
+  statusBefore: {
+    type: DataTypes.STRING,
+    allowNull: true,
+  },
+  statusAfter: {
+    type: DataTypes.STRING,
+    allowNull: true,
+  },
 };

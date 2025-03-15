@@ -482,13 +482,15 @@ export const updateItemStatus = async (req, res) => {
 };
 
 export const updateItemStatusForm = async (req, res) => {
-  const { itemName, status, itemYear, reason } = req.body;
+  const { item_number, itemName, status, itemYear, reason, itemStartUseDate, itemEndUseDate } = req.body;
   try {
-    if (!itemName || !status) {
+    if (!status || !itemName) {
       return res.status(400).json({ message: "Missing required fields" });
     }
+
     const item = await itemModel.findOne({
-      where: { name: itemName, year: itemYear, deletedAt: null },
+      // where: { name: itemName, year: itemYear, deletedAt: null },
+      where: { item_number, deletedAt: null },
       include: [
         {
           model: machineModel,
@@ -502,6 +504,29 @@ export const updateItemStatusForm = async (req, res) => {
 
     if (prevStatus === status) {
       return res.status(400).json({ message: `Cannot change status to '${status}' again` });
+    }
+
+    if (item.status === "In Use") {
+      const itemUseHistories = await itemUseHistoryModel.findAll({
+        where: { itemId: item.id },
+      });
+      const totalUseCount = itemUseHistories.length;
+      const dayUsed = Math.ceil((new Date(itemEndUseDate) - new Date(itemStartUseDate)) / (1000 * 60 * 60 * 24)); // Calculate the difference in days
+
+      await itemUseHistoryModel.create({
+        itemId: item.id,
+        replacementItemId: null,
+        itemStartUseDate: itemStartUseDate,
+        itemEndUseDate: itemEndUseDate,
+        useAmount: totalUseCount + 1,
+        reason,
+        dayUsed,
+      });
+      const totalDayUsed = item.dayUsed + dayUsed;
+
+      // Update item status
+      await itemModel.update({ status, dayUsed: totalDayUsed, replacementDate: currentDate }, { where: { id: item.id } });
+      //update item replacement status
     }
 
     // Membuat deskripsi item dan data tabel
@@ -551,6 +576,8 @@ export const updateItemStatusForm = async (req, res) => {
       category: "Part",
       username: req.name,
       description: reason,
+      statusBefore: prevStatus,
+      statusAfter: status,
     });
 
     // Log the update action in the audit logs
@@ -559,6 +586,17 @@ export const updateItemStatusForm = async (req, res) => {
     res.status(200).json({ message: "Part status updated" });
   } catch (error) {
     console.log(`Error: ${error.message}`);
+    res.status(500).json({ message: error.message });
+  }
+};
+
+export const updateInUseStatus = async (req, res) => {
+  try {
+    const { itemName, item_id, status, itemYear, reason } = req.body;
+
+    await itemModel.update({ inUse: status }, { where: { id: item_id } });
+    res.status(200).json({ message: "Part inUse status updated" });
+  } catch (error) {
     res.status(500).json({ message: error.message });
   }
 };
@@ -704,19 +742,6 @@ export const swapItem = async (req, res) => {
         }
       }
 
-      // Membuat PDF
-      // createPDFWithTable(title, headers, rows, async (pdfBuffer) => {
-      //   if (itemStatus === "Broken") {
-      //     try {
-      //       await sendEmailWithPDF(adminEmails, `${item.name} is Broken`, `Part ${item.name} is now ${itemStatus}.`, fileName, pdfBuffer);
-      //       await addItemHistories(item.id, req.userId, "Part Broken");
-      //     } catch (error) {
-      //       console.log(`Email failed to send: ${error}`);
-      //       return res.status(500).json({ message: "Email failed to send." });
-      //     }
-      //   }
-      // });
-
       const itemUseHistories = await itemUseHistoryModel.findAll({
         where: { itemId: item.id },
       });
@@ -783,19 +808,6 @@ export const swapItem = async (req, res) => {
           return res.status(500).json({ message: error.message });
         }
       }
-
-      // Membuat PDF
-      // createPDFWithTable(title, headers, rows, async (pdfBuffer) => {
-      //   if (itemStatus === "Broken") {
-      //     try {
-      //       await sendEmailWithPDF(adminEmails, `${item.name} is Broken`, `Part ${item.name} is now ${itemStatus}.`, fileName, pdfBuffer);
-      //       await addItemHistories(item.id, req.userId, "Part Broken");
-      //     } catch (error) {
-      //       console.log(`Email failed to send: ${error}`);
-      //       return res.status(500).json({ message: "Email failed to send." });
-      //     }
-      //   }
-      // });
 
       const itemUseHistories = await itemUseHistoryModel.findAll({
         where: { itemId: item.id },
