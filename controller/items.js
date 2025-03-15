@@ -266,7 +266,7 @@ export const createItem = async (req, res) => {
 
       return res.status(201).json({ message: "Part Added", data: newPart });
     } else if (replacementType === "Swap") {
-      if (partById) return res.status(400).json({ message: `${name} with ${item_number} is already exist, please use different Part Number` });
+      if (partById) return res.status(400).json({ message: `Part Number ${item_number} is already exist, please use different Part Number` });
 
       const newPart = await itemModel.create({
         name,
