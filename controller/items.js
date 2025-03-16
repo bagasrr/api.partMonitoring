@@ -354,6 +354,7 @@ export const updateItem = async (req, res) => {
     if (req.role === "admin") {
       await itemModel.update(
         {
+          item_number,
           name,
           amount,
           description,
