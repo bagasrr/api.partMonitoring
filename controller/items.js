@@ -320,7 +320,7 @@ export const updateItem = async (req, res) => {
     });
     if (!item) return res.status(404).json({ message: "Part not found" });
 
-    const { name, amount, description, status, lowerLimit, machine_name, machine_number, replacementType, year } = req.body;
+    const { item_number, name, amount, description, status, lowerLimit, machine_name, machine_number, replacementType, year } = req.body;
 
     // Find or create the new machine
     let machine = await machineModel.findOne({ where: { machine_name } });
@@ -370,12 +370,12 @@ export const updateItem = async (req, res) => {
       if (req.userId !== item.userId) return res.status(403).json({ message: "You are not allowed to update this item" });
       await itemModel.update(
         {
+          item_number,
           name,
           amount,
           description,
           status,
           lowerLimit,
-
           machineId: machine.id,
         },
         { where: { [Op.and]: [{ id: item.id }, { userId: req.userId }] } }
@@ -385,6 +385,7 @@ export const updateItem = async (req, res) => {
 
     // Log the update action in the audit logs
     await logAuditEvent("Item", item.id, "update", {
+      item_number,
       name,
       amount,
       description,
