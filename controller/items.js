@@ -527,7 +527,7 @@ export const updateItemStatusForm = async (req, res) => {
       const totalDayUsed = item.dayUsed + dayUsed;
 
       // Update item status
-      await itemModel.update({ status, dayUsed: totalDayUsed, replacementDate: currentDate }, { where: { id: item.id } });
+      await itemModel.update({ status, dayUsed: totalDayUsed, replacementDate: itemEndUseDate }, { where: { id: item.id } });
       //update item replacement status
     }
 
@@ -563,7 +563,7 @@ export const updateItemStatusForm = async (req, res) => {
     }
 
     await itemModel.update(
-      { status },
+      { status, replacementDate: itemEndUseDate },
       {
         where: { name: itemName, year: itemYear },
       }
